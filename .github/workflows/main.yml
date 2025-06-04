@@ -1,4 +1,4 @@
-name: Ruby on Rails Specs
+name: RSpec Tests
 
 on:
   push:
@@ -7,52 +7,46 @@ on:
 
 jobs:
   test:
-    name: Rspec
+    name: Run RSpec
     runs-on: ubuntu-latest
 
     services:
       postgres:
-        image: postgres:14.9
-        ports:
-          - 5432:5432
+        image: postgres:13
         env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: bank_api_test
-          PGUSER: postgres
-          PGPASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 3.2.2
-        bundler-cache: true
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2.2'
+          bundler-cache: true
 
-    - name: Install dependencies
-      run: |
-        gem install bundler
-        bundle install
+      - name: Install PostgreSQL client
+        run: sudo apt-get install -y libpq-dev
 
-    - name: Start PostgreSQL service
-      run: |
-        sudo service postgresql start
+      - name: Set up database
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: "postgres://postgres:postgres@localhost:5432/bank_api_test"
+        run: |
+          bin/rails db:create
+          bin/rails db:schema:load
 
-    - name: Check PostgreSQL status
-      run: |
-        systemctl status postgresql
-
-    - name: Create PostgreSQL user
-      run: |
-        sudo -u postgres createuser runner -s
-
-    - name: Set up database
-      run: |
-        sleep 5
-        bundle exec rake db:create RAILS_ENV=test
-        bundle exec rake db:migrate RAILS_ENV=test
-
-    - name: Run tests
-      run: |
-        bundle exec rspec
+      - name: Run RSpec
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: "postgres://postgres:postgres@localhost:5432/bank_api_test"
+        run: |
+          bundle exec rspec
