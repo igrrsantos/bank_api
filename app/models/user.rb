@@ -10,4 +10,15 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
          :jwt_authenticatable, jwt_revocation_strategy: self
+
+
+  private
+
+  def valid_cpf_format
+    return if cpf.blank?
+
+    unless CPF.valid?(cpf)
+      errors.add(:cpf, 'não é válido')
+    end
+  end
 end
