@@ -2,8 +2,8 @@ name: Ruby on Rails Specs
 
 on:
   push:
-    branches:
-      - master
+    branches: ['*']
+  pull_request:
 
 jobs:
   test:
