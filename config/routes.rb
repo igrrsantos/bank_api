@@ -12,10 +12,8 @@ Rails.application.routes.draw do
           registrations: 'registrations',
           sessions: 'sessions'
         }
-      # # Criar usuário
-      # POST /api/v1/users
-      # #Login
-      # POST /api/v1/auth/login
+
+      resources :bank_accounts, only: [:create]
       # # Consultar saldo
       # GET /api/v1/conta/saldo
       # # Realizar transferência
