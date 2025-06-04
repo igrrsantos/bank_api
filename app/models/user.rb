@@ -1,7 +1,8 @@
 class User < ApplicationRecord
   has_many :bank_accounts
 
-  validates :cpf, presence: true, uniqueness: true, cpf: true
+  validates :cpf, presence: true, uniqueness: true
+  validate :valid_cpf_format
   validates :name, presence: true
 
   # Include default devise modules. Others available are:

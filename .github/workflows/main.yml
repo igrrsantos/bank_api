@@ -1,0 +1,58 @@
+name: Ruby on Rails Specs
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: Rspec
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14.9
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: bank_api_test
+          PGUSER: postgres
+          PGPASSWORD: postgres
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.2
+        bundler-cache: true
+
+    - name: Install dependencies
+      run: |
+        gem install bundler
+        bundle install
+
+    - name: Start PostgreSQL service
+      run: |
+        sudo service postgresql start
+
+    - name: Check PostgreSQL status
+      run: |
+        systemctl status postgresql
+
+    - name: Create PostgreSQL user
+      run: |
+        sudo -u postgres createuser runner -s
+
+    - name: Set up database
+      run: |
+        sleep 5
+        bundle exec rake db:create RAILS_ENV=test
+        bundle exec rake db:migrate RAILS_ENV=test
+
+    - name: Run tests
+      run: |
+        bundle exec rspec
