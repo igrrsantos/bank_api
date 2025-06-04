@@ -1,7 +1,8 @@
 class User < ApplicationRecord
   has_many :bank_accounts
 
-  validates :cpf, presence: true, uniqueness: true, cpf: true
+  validates :cpf, presence: true, uniqueness: true
+  validate :valid_cpf_format
   validates :name, presence: true
 
   # Include default devise modules. Others available are:
@@ -9,4 +10,15 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
          :jwt_authenticatable, jwt_revocation_strategy: self
+
+
+  private
+
+  def valid_cpf_format
+    return if cpf.blank?
+
+    unless CPF.valid?(cpf)
+      errors.add(:cpf, 'não é válido')
+    end
+  end
 end

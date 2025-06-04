@@ -1,0 +1,52 @@
+name: RSpec Tests
+
+on:
+  push:
+    branches: ['*']
+  pull_request:
+
+jobs:
+  test:
+    name: Run RSpec
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: bank_api_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2.2'
+          bundler-cache: true
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get install -y libpq-dev
+
+      - name: Set up database
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: "postgres://postgres:postgres@localhost:5432/bank_api_test"
+        run: |
+          bin/rails db:create
+          bin/rails db:schema:load
+
+      - name: Run RSpec
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: "postgres://postgres:postgres@localhost:5432/bank_api_test"
+        run: |
+          bundle exec rspec

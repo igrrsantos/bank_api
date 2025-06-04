@@ -51,6 +51,7 @@ group :development, :test do
   gem 'pry', '~> 0.15.0'
   gem 'rspec-rails'
   gem 'rswag-specs'
+  gem 'shoulda-matchers'
   gem 'factory_bot_rails'
   gem 'faker'
 end
