@@ -1,8 +1,17 @@
 Rails.application.routes.draw do
-  devise_for :users
-
   namespace :api do
     namespace :v1 do
+      devise_for :users,
+        path: 'auth',
+        path_names: {
+          sign_in: 'login',
+          sign_out: 'logout',
+          registration: 'signup'
+        },
+        controllers: {
+          registrations: 'registrations',
+          sessions: 'sessions'
+        }
       # # Criar usuário
       # POST /api/v1/users
       # #Login
@@ -17,6 +26,6 @@ Rails.application.routes.draw do
       # GET /api/v1/extrato
     end
   end
-
   get "up" => "rails/health#show", as: :rails_health_check
+
 end
