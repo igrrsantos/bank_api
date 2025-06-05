@@ -45,7 +45,7 @@ class ApplicationController < ActionController::API
   end
 
   def current_user_id
-    @current_user.id
+    ENV['CURRENT_USER_ID'].to_i if Rails.env.test? && ENV['CURRENT_USER_ID']
   end
 
   def serialize_data(data, serializer_class)
