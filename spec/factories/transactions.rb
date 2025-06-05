@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :transaction do
     association :origin_account, factory: :bank_account
     association :destination_account, factory: :bank_account
-    amount { Faker::Number.between(from: 1.0, round: 2) } # Valor mínimo de 1.00
+    amount { Faker::Number.between(from: 1.0, round: 2) }
     description { Faker::Lorem.sentence(word_count: 3) }
     transaction_date { Faker::Time.between(from: 1.year.ago, to: Time.current) }
 

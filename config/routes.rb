@@ -14,9 +14,9 @@ Rails.application.routes.draw do
                  }
 
       resources :bank_accounts, only: [:create]
+      resources :transactions, only: [:create]
       get '/bank_accounts/balance', to: 'bank_accounts#balance'
-      # # Consultar saldo
-      # GET /api/v1/conta/saldo
+      get '/bank_accounts/bank_statement', to: 'bank_accounts#bank_statement'
       # # Realizar transferência
       # POST /api/v1/transferencias
       # # Agendar transferência
@@ -25,6 +25,6 @@ Rails.application.routes.draw do
       # GET /api/v1/extrato
     end
   end
-  get "up" => "rails/health#show", as: :rails_health_check
 
+  get 'up' => 'rails/health#show', as: :rails_health_check
 end

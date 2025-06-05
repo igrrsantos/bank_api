@@ -2,9 +2,9 @@ module Api
   module V1
     class TransactionsController < ApplicationController
       def create
-        valid_params = valid_attributes(CreateTransactionContract, params[:bank_account])
+        valid_params = valid_attributes(CreateTransactionContract, params[:transaction])
 
-        result = CreateTransactionService.new.call(valid_params.merge(user_id: current_user_id))
+        result = CreateTransactionService.new(valid_params.merge(user_id: current_user_id)).call
 
         if result.success?
           render json: TransactionSerializer.new(result.value!).as_json

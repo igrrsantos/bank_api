@@ -1,6 +1,8 @@
 class CreateTransactionContract < Dry::Validation::Contract
   params do
-    required(:bank_number).filled(:string)
-    required(:bank_agency_number).filled(:string)
+    required(:origin_account_id).filled(:string)
+    required(:destination_account_id).filled(:string)
+    required(:amount).filled(:float)
+    required(:description).filled(:string)
   end
 end

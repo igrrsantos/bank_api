@@ -52,8 +52,11 @@ gem 'dry-schema'
 gem 'dry-types'
 gem 'dry-validation'
 
-# Use ActiveModelSerializers to serializer responses
+# Use ActiveModelSerializers for serializer responses
 gem 'active_model_serializers'
+
+# Use Pagy for pagination
+gem 'pagy'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
