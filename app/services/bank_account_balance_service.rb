@@ -4,9 +4,11 @@ class BankAccountBalanceService
   def call(params)
     bank_account = bank_account_repository.find_by(params)
 
-    return Failure(bank_account.errors) if bank_account.errors.any?
+    raise ArgumentError, 'Conta de origem não pertence ao usuário' if bank_account.instance_of?(ActiveRecord::RecordNotFound)
 
     Success(bank_account)
+  rescue StandardError => e
+    Failure(e.message)
   end
 
   private
