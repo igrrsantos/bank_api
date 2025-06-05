@@ -1,19 +1,22 @@
 class UserRepository
-  class << self
-    def find(id)
-      User.find_by(id: id)
-    end
+  def find(id)
+    User.find(id)
+  end
 
-    def create(attributes)
-      User.create(attributes)
-    end
+  def create(attributes)
+    user = User.create(attributes)
+    user.save
+  end
 
-    def update(user, attributes)
-      user.update(attributes)
-    end
+  def update(user, attributes)
+    user.update(attributes)
+  end
 
-    def delete(user)
-      user.destroy
-    end
+  def delete(user)
+    user.destroy
+  end
+
+  def find_by(attributes)
+    User.find_by!(attributes)
   end
 end
