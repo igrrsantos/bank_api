@@ -7,6 +7,7 @@ class ScheduleTransactionService
 
   def call
     CreateTransactionJob.set(wait_until: run_on.to_datetime).perform_later(params)
+    Success()
   rescue StandardError => e
     Failure(e.message)
   end

@@ -13,9 +13,4 @@ class SessionsController < Devise::SessionsController
       render json: { errors: result.failure }, status: :unprocessable_entity
     end
   end
-
-  def destroy
-    sign_out(current_user)
-    render json: { message: 'Logged out successfully' }, status: :ok
-  end
 end

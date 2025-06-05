@@ -51,8 +51,13 @@ class TransactionRepository
     end
 
     query = query.order(transaction_date: :desc)
-    pagy(query, page: attributes[:pagy_params][:page],
-                items: attributes[:pagy_params][:items], limit: attributes[:pagy_params][:items])
+
+    if attributes[:page].present?
+      pagy(query, page: attributes[:page],
+                  items: attributes[:per_page], limit: attributes[:per_page])
+    else
+      query
+    end
   rescue StandardError => e
     e
   end

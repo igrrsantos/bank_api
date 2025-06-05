@@ -35,10 +35,6 @@ gem 'bootsnap', require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 gem 'rack-cors'
 
-# Use Swagger for documentation
-gem 'rswag-api'
-gem 'rswag-ui'
-
 # Use Devise for authentication
 gem 'devise'
 gem 'devise-jwt'
@@ -67,6 +63,9 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'rspec-rails'
   gem 'rswag-specs'
+  gem 'rswag'
+  gem 'rswag-api'
+  gem 'rswag-ui'
   gem 'shoulda-matchers'
   gem 'faker'
 end

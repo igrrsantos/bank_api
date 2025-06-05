@@ -1,4 +1,18 @@
 pt-BR:
+  activerecord:
+    errors:
+      models:
+        transaction:
+          attributes:
+            amount:
+              greater_than: "deve ser maior que %{count}"
+        user:
+          attributes:
+            cpf:
+              taken: "já está em uso"
+      messages:
+        taken: "já está em uso"
+        greater_than: "deve ser maior que %{count}"
   date:
     month_names: [~, Janeiro, Fevereiro, Março, Abril, Maio, Junho, Julho, Agosto, Setembro, Outubro, Novembro, Dezembro]
     formats:

@@ -28,7 +28,7 @@ RSpec.describe Transaction, type: :model do
         )
 
         expect(transaction).not_to be_valid
-        expect(transaction.errors[:amount]).to include('must be greater than 0')
+        expect(transaction.errors[:amount]).to include('deve ser maior que 0')
       end
     end
 
@@ -40,7 +40,7 @@ RSpec.describe Transaction, type: :model do
         )
 
         expect(transaction).not_to be_valid
-        expect(transaction.errors[:amount]).to include('must be greater than 0')
+        expect(transaction.errors[:amount]).to include('deve ser maior que 0')
       end
     end
 

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount Rswag::Ui::Engine => '/api-docs'
+  mount Rswag::Api::Engine => '/api-docs'
   require 'sidekiq/web'
 
   namespace :api do
@@ -7,7 +9,6 @@ Rails.application.routes.draw do
                  path: 'auth',
                  path_names: {
                    sign_in: 'login',
-                   sign_out: 'logout',
                    registration: 'signup'
                  },
                  controllers: {
@@ -16,10 +17,9 @@ Rails.application.routes.draw do
                  }
 
       resources :bank_accounts, only: [:create]
-      get '/bank_accounts/balance', to: 'bank_accounts#balance'
+      get '/bank_accounts/:id/balance', to: 'bank_accounts#balance'
       post '/bank_accounts/deposit', to: 'bank_accounts#deposit'
-      get '/bank_accounts/bank_statement', to: 'bank_accounts#bank_statement'
-      get '/bank_accounts/bank_statement', to: 'bank_accounts#bank_statement'
+      get '/bank_accounts/:id/bank_statement', to: 'bank_accounts#bank_statement'
 
       resources :transactions, only: [:create]
       post '/transactions/schedule', to: 'transactions#schedule'

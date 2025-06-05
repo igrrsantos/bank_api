@@ -1,6 +1,6 @@
 class BankStatementContract < Dry::Validation::Contract
   params do
-    required(:bank_account_id).filled(:string)
+    required(:id).filled(:string)
     optional(:page).value(:string)
     optional(:per_page).value(:string)
     optional(:start_date).value(:string)

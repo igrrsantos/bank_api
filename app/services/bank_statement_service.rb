@@ -3,18 +3,16 @@ class BankStatementService
   def initialize(params)
     @bank_account_params = {
       user_id: params.delete(:user_id),
-      id: params[:bank_account_id]
+      id: params[:id]
     }
     @params = {
-      bank_account_id: params[:bank_account_id],
+      bank_account_id: params[:id],
       start_date: params[:start_date],
       end_date: params[:end_date],
       min_amount: params[:min_amount],
       sent: params[:sent],
-      pagy_params: {
-        page: params[:page].to_i,
-        items: params[:per_page].to_i
-      }
+      page: params[:page],
+      per_page: params[:per_page]
     }.compact
   end
 
@@ -24,14 +22,26 @@ class BankStatementService
     return Failure(bank_account.errors) if bank_account.errors.any?
 
     parse_period_attrs
-    pagy, transaction = transaction_repository.where(params)
+    pagy_params
 
-    [pagy, Success(transaction)]
+    if params[:page] && params[:per_page]
+      pagy, transaction = transaction_repository.where(params)
+      [Success(transaction), pagy]
+    else
+      transaction = transaction_repository.where(params)
+      Success(transaction)
+    end
   end
 
   private
 
-  attr_reader :bank_account_params, :params, :pagy_params
+  attr_reader :bank_account_params, :params
+
+  def pagy_params
+    return unless params[:page] && params[:per_page]
+
+    params.merge(page: params[:page].to_i, items: params[:per_page].to_i)
+  end
 
   def parse_period_attrs
     if params[:start_date].present? && params[:end_date].present?

@@ -1,0 +1,323 @@
+---
+openapi: 3.0.1
+info:
+  title: Bank API
+  version: v1
+  description: API for banking operations
+servers:
+- url: http://{defaultHost}
+  variables:
+    defaultHost:
+      default: localhost:3000
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  "/api/v1/bank_accounts":
+    post:
+      summary: Creates a bank account
+      tags:
+      - BankAccounts
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: bank account created
+        '422':
+          description: bank_number already exists
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bank_account:
+                  type: object
+                  properties:
+                    bank_number:
+                      type: string
+                    bank_agency_number:
+                      type: string
+                  required:
+                  - bank_number
+                  - bank_agency_number
+              required:
+              - bank_account
+  "/api/v1/bank_accounts/{id}/balance":
+    get:
+      summary: Returns the account balance
+      tags:
+      - BankAccounts
+      parameters:
+      - name: id
+        in: path
+        description: Bank Account ID
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: returns the account balance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  bank_number:
+                    type: string
+                  bank_agency_number:
+                    type: string
+                  balance:
+                    type: string
+                required:
+                - id
+                - bank_number
+                - bank_agency_number
+                - balance
+        '422':
+          description: account not found or invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                required:
+                - errors
+  "/api/v1/bank_accounts/{id}/bank_statement":
+    get:
+      summary: Returns the bank statement for the account
+      tags:
+      - BankAccounts
+      parameters:
+      - name: id
+        in: path
+        description: Bank Account ID
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Page number
+        schema:
+          type: string
+      - name: per_page
+        in: query
+        required: false
+        description: Items per page
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: returns paginated bank statement
+  "/api/v1/bank_accounts/deposit":
+    post:
+      summary: Deposits value into a bank account
+      tags:
+      - BankAccounts
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: account with updated balance (created)
+        '422':
+          description: account not found or does not belong to user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bank_account:
+                  type: object
+                  properties:
+                    value:
+                      type: string
+                    id:
+                      type: string
+                  required:
+                  - value
+                  - id
+              required:
+              - bank_account
+  "/api/v1/auth/signup":
+    post:
+      summary: User registration
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '201':
+          description: user created
+        '422':
+          description: validation errors (invalid params)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    email:
+                      type: string
+                      format: email
+                    password:
+                      type: string
+                    password_confirmation:
+                      type: string
+                    cpf:
+                      type: string
+                  required:
+                  - name
+                  - email
+                  - password
+                  - password_confirmation
+                  - cpf
+              required:
+              - user
+  "/api/v1/auth/login":
+    post:
+      summary: Performs user login
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '200':
+          description: valid credentials
+        '422':
+          description: contract validation errors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                    password:
+                      type: string
+                  required:
+                  - email
+                  - password
+              required:
+              - user
+  "/api/v1/transactions":
+    post:
+      summary: Create a transaction (immediate)
+      tags:
+      - Transactions
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: transaction created
+        '422':
+          description: invalid parameters
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transaction:
+                  type: object
+                  properties:
+                    origin_account_id:
+                      type: string
+                    destination_account_id:
+                      type: string
+                    amount:
+                      type: number
+                    description:
+                      type: string
+                    idempotency_key:
+                      type: string
+                  required:
+                  - origin_account_id
+                  - destination_account_id
+                  - amount
+                  - description
+                  - idempotency_key
+              required:
+              - transaction
+  "/api/v1/transactions/schedule":
+    post:
+      summary: Schedule a transaction
+      tags:
+      - Transactions
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: transaction scheduled
+        '422':
+          description: invalid parameters for scheduling
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transaction:
+                  type: object
+                  properties:
+                    origin_account_id:
+                      type: string
+                    destination_account_id:
+                      type: string
+                    amount:
+                      type: number
+                    description:
+                      type: string
+                    run_on:
+                      type: string
+                      format: date
+                  required:
+                  - origin_account_id
+                  - destination_account_id
+                  - amount
+                  - description
+                  - run_on
+              required:
+              - transaction

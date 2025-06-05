@@ -7,7 +7,7 @@ class RegistrationsController < Devise::RegistrationsController
 
     resource.save
     if resource.persisted?
-      render json: { message: 'User signed up successfully', user: resource }, status: :ok
+      render json: { message: 'User signed up successfully', user: resource }, status: :created
     else
       render json: { errors: resource.errors.full_messages }, status: :unprocessable_entity
     end
