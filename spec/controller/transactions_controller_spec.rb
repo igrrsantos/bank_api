@@ -27,13 +27,12 @@ RSpec.describe Api::V1::TransactionsController, type: :request do
         required: ['transaction']
       }
       parameter name: :Authorization, in: :header, type: :string, required: true
-
       let(:Authorization) { headers['Authorization'] }
       let!(:origin_account) { create(:bank_account, user: user, balance: 500.0) }
       let!(:destination_account) { create(:bank_account, balance: 100.0) }
 
       response '200', 'transaction created' do
-        let(:transaction) do
+        let!(:transaction) do
           {
             transaction: {
               origin_account_id: origin_account.id.to_s,
@@ -44,7 +43,6 @@ RSpec.describe Api::V1::TransactionsController, type: :request do
             }
           }
         end
-
         run_test! do |response|
           expect(json).to include(
             'origin_account_id' => origin_account.id,
