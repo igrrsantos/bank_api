@@ -35,11 +35,12 @@ RSpec.describe 'api/v1/auth SessionsController requests', type: :request do
     end
 
     context 'with invalid credentials' do
+      let!(:user) { create(:user) }
       let!(:login_params) do
         {
           user: {
-            email: 'teste@teste.com',
-            password: 'password123'
+            email: user.email,
+            password: 'wrongpassword'
           }
         }
       end

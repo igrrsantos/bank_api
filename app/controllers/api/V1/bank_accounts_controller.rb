@@ -9,7 +9,7 @@ module Api
         if result.success?
           render json: result.value!,
                  each_serializer: BankAccountSerializer,
-                 status: :ok
+                 status: :created
         else
           render json: { errors: result.failure }, status: :unprocessable_entity
         end
@@ -37,6 +37,18 @@ module Api
             data: serialize_data(paginated_result.value!, BankStatementSerializer),
             pagination: pagy_metadata(pagy)
           }, status: :ok
+        else
+          render json: { errors: result.failure }, status: :unprocessable_entity
+        end
+      end
+
+      def deposit
+        valid_params = valid_attributes(DepositContract, params)
+
+        result = DepositService.new(valid_params.merge(user_id: current_user_id)).call
+
+        if result.success?
+          render json: BankAccountSerializer.new(result.value!).as_json
         else
           render json: { errors: result.failure }, status: :unprocessable_entity
         end

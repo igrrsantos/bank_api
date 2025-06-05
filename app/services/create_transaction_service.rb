@@ -1,6 +1,7 @@
 class CreateTransactionService
   include Dry::Monads[:result]
   def initialize(params)
+    @amount = params[:amount]
     @origin_account_params = {
       user_id: params.delete(:user_id),
       id: params[:origin_account_id]
@@ -10,20 +11,31 @@ class CreateTransactionService
 
   def call
     origin_account = bank_account_repository.find_by(origin_account_params)
+    destination_account = bank_account_repository.find(params[:destination_account_id])
 
-    return Failure(origin_account.errors) if origin_account.errors.any?
+    raise ArgumentError, 'Conta de origem não pertence ao usuário' if origin_account.errors.any?
+    raise ArgumentError, 'Valor da transferência deve ser positivo' if amount <= 0
+    raise ArgumentError, 'Conta de origem e destino devem ser diferentes' if origin_account.id == destination_account.id
+    raise StandardError, 'Saldo insuficiente na conta de origem' if origin_account.balance < amount
 
-    transaction = transaction_repository.new_entity(params.merge(transaction_date))
-    transaction_repository.save(transaction)
+    ActiveRecord::Base.transaction do
+      bank_account_repository.update(balance: origin_account.balance.to_f - amount.to_f)
+      bank_account_repository.update(balance: destination_account.balance.to_f + amount.to_f)
 
-    return Failure(transaction.errors) if transaction.errors.any?
+      transaction = transaction_repository.new_entity(params.merge(transaction_date))
+      transaction_repository.save(transaction)
+    end
+
+    raise ArgumentError, 'Ocorreu um erro durante a transação' if transaction.errors.any?
 
     Success(transaction)
+  rescue StandardError => e
+    Failure(e)
   end
 
   private
 
-  attr_reader :origin_account_params, :params
+  attr_reader :amount, :origin_account_params, :params
 
   def bank_account_repository
     @bank_account_repository ||= BankAccountRepository.new

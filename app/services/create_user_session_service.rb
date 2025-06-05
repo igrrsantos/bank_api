@@ -8,6 +8,8 @@ class CreateUserSessionService
     return Failure('Invalid email or password') unless user&.valid_password?(user_params[:password])
 
     Success({ user: user, token: user.generate_jwt })
+  rescue StandardError => e
+    Failure('Invalid email or password')
   end
 
   def user_repository

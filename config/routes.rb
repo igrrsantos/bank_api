@@ -16,13 +16,12 @@ Rails.application.routes.draw do
       resources :bank_accounts, only: [:create]
       resources :transactions, only: [:create]
       get '/bank_accounts/balance', to: 'bank_accounts#balance'
+      post '/bank_accounts/deposit', to: 'bank_accounts#deposit'
       get '/bank_accounts/bank_statement', to: 'bank_accounts#bank_statement'
       # # Realizar transferência
       # POST /api/v1/transferencias
       # # Agendar transferência
       # POST /api/v1/transferencias/agendada
-      # # Listar extrato
-      # GET /api/v1/extrato
     end
   end
 

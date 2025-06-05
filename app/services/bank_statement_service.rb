@@ -6,7 +6,11 @@ class BankStatementService
       id: params[:origin_account_id]
     }
     @params = {
-      origin_account_id: params[:origin_account_id]
+      origin_account_id: params[:origin_account_id],
+      pagy_params: {
+        page: params[:page].to_i,
+        items: params[:per_page].to_i
+      }
     }
   end
 
@@ -16,14 +20,13 @@ class BankStatementService
     return Failure(bank_account.errors) if bank_account.errors.any?
 
     pagy, transaction = transaction_repository.where(params)
-    binding.pry
 
     [pagy, Success(transaction)]
   end
 
   private
 
-  attr_reader :bank_account_params, :params
+  attr_reader :bank_account_params, :params, :pagy_params
 
   def bank_account_repository
     @bank_account_repository ||= BankAccountRepository.new
