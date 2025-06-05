@@ -1,6 +1,10 @@
 require 'swagger_helper'
 
 RSpec.describe 'Auth API', type: :request do
+  before do
+    allow_any_instance_of(ApplicationController).to receive(:current_user_id).and_return(user.id)
+  end
+
   path '/api/v1/auth/login' do
     post 'Performs user login' do
       tags 'Auth'

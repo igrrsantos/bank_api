@@ -5,6 +5,10 @@ RSpec.describe Api::V1::TransactionsController, type: :request do
   let!(:user) { create(:user) }
   let(:headers) { { 'Authorization' => "Bearer #{user.generate_jwt}" } }
 
+  before do
+    allow_any_instance_of(ApplicationController).to receive(:current_user_id).and_return(user.id)
+  end
+
   path '/api/v1/transactions' do
     post 'Create a transaction (immediate)' do
       tags 'Transactions'

@@ -5,6 +5,10 @@ RSpec.describe Api::V1::BankAccountsController, type: :request do
   let!(:user) { create(:user) }
   let(:headers) { { 'Authorization' => "Bearer #{user.generate_jwt}" } }
 
+  before do
+    allow_any_instance_of(ApplicationController).to receive(:current_user_id).and_return(user.id)
+  end
+
   path '/api/v1/bank_accounts' do
     post 'Creates a bank account' do
       tags 'BankAccounts'

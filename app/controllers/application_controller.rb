@@ -24,11 +24,9 @@ class ApplicationController < ActionController::API
     token = auth_header.split(' ').last
 
     begin
-      # Use a chave secreta do Devise-JWT (ou Rails.application.credentials.secret_key_base)
       secret = Devise::JWT.config.secret || Rails.application.credentials.secret_key_base
       decoded = JWT.decode(token, secret, true, algorithm: 'HS256')
 
-      # Ajuste para o payload correto (sub ou user_id)
       user_id = decoded.first['sub'] || decoded.first['user_id']
       @current_user = User.find(user_id)
     rescue JWT::ExpiredSignature
