@@ -2,15 +2,6 @@ require 'rails_helper'
 
 RSpec.describe BankAccount, type: :model do
   let(:user) { create(:user) }
-  let(:valid_attributes) do
-    {
-      user: user,
-      bank_number: '12345678',
-      bank_agency_number: '0001',
-      balance: 1000.00
-    }
-  end
-
   describe 'validations' do
     it 'is valid with valid attributes' do
       account = create(:bank_account)
@@ -31,7 +22,7 @@ RSpec.describe BankAccount, type: :model do
       it 'is invalid' do
         account = build(:bank_account, user: user, bank_number: '12345678')
         expect(account).not_to be_valid
-        expect(account.errors[:bank_number]).to include('has already been taken')
+        expect(account.errors[:bank_number]).to include('já está em uso')
       end
     end
 

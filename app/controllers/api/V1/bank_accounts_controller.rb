@@ -30,25 +30,27 @@ module Api
       def bank_statement
         valid_params = valid_attributes(BankStatementContract, params)
 
-        pagy, paginated_result = BankStatementService.new(valid_params.merge(user_id: current_user_id)).call
+        paginated_result, pagy = BankStatementService.new(valid_params.merge(user_id: current_user_id)).call
 
         if paginated_result.success?
-          render json: {
-            data: serialize_data(paginated_result.value!, BankStatementSerializer),
-            pagination: pagy_metadata(pagy)
-          }, status: :ok
+          response_data = {
+            data: serialize_data(paginated_result.value!, BankStatementSerializer)
+          }
+
+          response_data[:pagination] = pagy_metadata(pagy) if pagy.present?
+          render json: response_data, status: :ok
         else
           render json: { errors: result.failure }, status: :unprocessable_entity
         end
       end
 
       def deposit
-        valid_params = valid_attributes(DepositContract, params)
+        valid_params = valid_attributes(DepositContract, params[:bank_account])
 
         result = DepositService.new(valid_params.merge(user_id: current_user_id)).call
 
         if result.success?
-          render json: BankAccountSerializer.new(result.value!).as_json
+          render json: BankAccountSerializer.new(result.value!).as_json, status: :created
         else
           render json: { errors: result.failure }, status: :unprocessable_entity
         end

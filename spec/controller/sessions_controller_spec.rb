@@ -1,62 +1,70 @@
-require 'rails_helper'
-include Dry::Monads[:result]
+require 'swagger_helper'
 
-RSpec.describe 'api/v1/auth SessionsController requests', type: :request do
-  describe 'POST /api/v1/auth/login' do
-    subject(:login) do
-      post '/api/v1/auth/login',
-           params: login_params
-    end
-
-    context 'with valid credentials' do
-      let!(:user) { create(:user) }
-      let!(:login_params) do
-        {
+RSpec.describe 'Auth API', type: :request do
+  path '/api/v1/auth/login' do
+    post 'Performs user login' do
+      tags 'Auth'
+      consumes 'application/json'
+      produces 'application/json'
+      parameter name: :user_param, in: :body, schema: {
+        type: :object,
+        properties: {
           user: {
-            email: user.email,
-            password: user.password
+            type: :object,
+            properties: {
+              email: { type: :string, format: :email },
+              password: { type: :string }
+            },
+            required: %w[email password]
           }
-        }
-      end
+        },
+        required: ['user']
+      }
 
-      it 'returns a successful response with user and token' do
-        login
-        expect(response).to have_http_status(:ok)
-        expect(json).to include(
+      response '200', 'valid credentials' do
+        let!(:user) { create(:user) }
+        let(:user_param) do
           {
+            user: {
+              email: user.email,
+              password: user.password
+            }
+          }
+        end
+
+        run_test! do |response|
+          expect(json).to include(
             'id' => user.id,
             'name' => user.name,
             'email' => user.email
+          )
+          expect(json['token']).to be_a(String)
+          expect(json['token']).not_to be_empty
+        end
+      end
+
+      response '422', 'invalid credentials' do
+        let!(:user) { create(:user) }
+        let(:user_param) do
+          {
+            user: {
+              email: user.email,
+              password: 'wrongpassword'
+            }
           }
-        )
-        expect(json['token']).to be_a(String)
-        expect(json['token']).not_to be_empty
-      end
-    end
+        end
 
-    context 'with invalid credentials' do
-      let!(:user) { create(:user) }
-      let!(:login_params) do
-        {
-          user: {
-            email: user.email,
-            password: 'wrongpassword'
-          }
-        }
+        run_test! do |response|
+          expect(json).to eq({ 'errors' => 'Invalid email or password' })
+        end
       end
 
-      it 'returns an error response' do
-        login
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)).to eq({ 'errors' => 'Invalid email or password' })
-      end
-    end
+      response '422', 'contract validation errors' do
+        let(:user_param) { { user: { email: 'a', password: 'a' } } }
 
-    context 'with invalid contract params' do
-      let!(:login_params) { { user: { email: '', password: '' } } }
-
-      it 'returns contract validation errors' do
-        expect { login }.to raise_error
+        run_test! do |response|
+          expect(json['errors']).not_to be_empty
+        end
       end
     end
   end

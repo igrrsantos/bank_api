@@ -10,7 +10,7 @@ RSpec.describe User, type: :model do
       user2 = build(:user, cpf: user1.cpf, email: 'teste@teste.com')
 
       expect(user2).not_to be_valid
-      expect(user2.errors[:cpf]).to include('has already been taken')
+      expect(user2.errors[:cpf]).to include('já está em uso')
     end
 
     context 'when CPF format is invalid' do

@@ -3,7 +3,7 @@ class DepositService
   def initialize(params)
     @bank_account_params = {
       user_id: params.delete(:user_id),
-      id: params.delete(:origin_account_id)
+      id: params.delete(:id)
     }
     @params = params
   end
