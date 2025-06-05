@@ -12,6 +12,18 @@ module Api
           render json: { errors: result.failure }, status: :unprocessable_entity
         end
       end
+
+      def schedule
+        valid_params = valid_attributes(ScheduleTransactionContract, params[:transaction])
+
+        result = ScheduleTransactionService.new(valid_params.merge(user_id: current_user_id)).call
+
+        if result.success?
+          render status: :no_content
+        else
+          render json: { errors: result.failure }, status: :unprocessable_entity
+        end
+      end
     end
   end
 end
