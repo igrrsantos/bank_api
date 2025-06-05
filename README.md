@@ -16,8 +16,6 @@ Implementada em **Ruby on Rails**, testada com **RSpec** e documentada via **Swa
 - [Autenticação](#autenticação)
 - [Principais Endpoints](#principais-endpoints)
 - [Customização de Mensagens de Erro](#customização-de-mensagens-de-erro)
-- [Contribuição](#contribuição)
-- [Contato](#contato)
 
 ---
 
