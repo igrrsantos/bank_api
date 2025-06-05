@@ -1,4 +1,7 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :id, :name, :email, :token
-  has_many :bank_accounts
+
+  def token
+    instance_options[:token]
+  end
 end

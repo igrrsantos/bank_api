@@ -47,9 +47,13 @@ gem 'devise-jwt'
 gem 'cpf_cnpj'
 
 # Use Dry
+gem 'dry-monads'
 gem "dry-validation"
 gem "dry-schema"
 gem "dry-types"
+
+# Use ActiveModelSerializers to serializer responses
+gem 'active_model_serializers'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
