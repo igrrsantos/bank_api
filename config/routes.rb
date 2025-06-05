@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  require 'sidekiq/web'
+
   namespace :api do
     namespace :v1 do
       devise_for :users,
@@ -18,12 +20,11 @@ Rails.application.routes.draw do
       get '/bank_accounts/balance', to: 'bank_accounts#balance'
       post '/bank_accounts/deposit', to: 'bank_accounts#deposit'
       get '/bank_accounts/bank_statement', to: 'bank_accounts#bank_statement'
-      # # Realizar transferência
-      # POST /api/v1/transferencias
       # # Agendar transferência
       # POST /api/v1/transferencias/agendada
     end
   end
 
+  mount Sidekiq::Web => '/sidekiq'
   get 'up' => 'rails/health#show', as: :rails_health_check
 end

@@ -38,9 +38,19 @@ class TransactionRepository
   end
 
   def where(attributes)
-    query = Transaction.where(destination_account_id: attributes[:origin_account_id])
-                       .or(Transaction.where(origin_account_id: attributes[:origin_account_id]))
+    query = Transaction.where(destination_account_id: attributes[:bank_account_id])
+                       .or(Transaction.where(origin_account_id: attributes[:bank_account_id]))
 
+    query = query.where(amount: attributes[:min_amount]..) if attributes[:min_amount].present?
+    query = query.where(transaction_date: attributes[:date]) if attributes[:date].present?
+
+    if attributes[:sent] == true
+      query = query.where(origin_account_id: attributes[:bank_account_id])
+    elsif attributes[:sent] == false
+      query = query.where(destination_account_id: attributes[:bank_account_id])
+    end
+
+    query = query.order(transaction_date: :desc)
     pagy(query, page: attributes[:pagy_params][:page],
                 items: attributes[:pagy_params][:items], limit: attributes[:pagy_params][:items])
   rescue StandardError => e
