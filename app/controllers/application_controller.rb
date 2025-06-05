@@ -45,6 +45,15 @@ class ApplicationController < ActionController::API
   end
 
   def current_user_id
+    puts '============================================================================================================'
+    puts '============================================================================================================'
+    puts '============================================================================================================'
+    request.headers['Authorization']
+    get_user_id_from_header
+    ENV['CURRENT_USER_ID']
+    puts '============================================================================================================'
+    puts '============================================================================================================'
+    puts '============================================================================================================'
     return get_user_id_from_header || ENV['CURRENT_USER_ID'].to_i if Rails.env.test?
 
     @current_user.id
@@ -56,7 +65,7 @@ class ApplicationController < ActionController::API
 
     secret = Devise::JWT.config.secret || Rails.application.credentials.secret_key_base
     decoded = JWT.decode(token, secret, true, algorithm: 'HS256')
-    user_id = decoded.first['sub'] || decoded.first['user_id']
+    decoded.first['sub'] || decoded.first['user_id']
   end
 
   def serialize_data(data, serializer_class)
