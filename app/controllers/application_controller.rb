@@ -1,7 +1,17 @@
+include Pagy::Backend
+
 class ApplicationController < ActionController::API
   respond_to :json
   before_action :authenticate_user!
   before_action :handle_options_request
+
+  def valid_attributes(contract_class, params)
+    result = contract_class.new.call(params&.to_unsafe_hash)
+
+    return result.values.data if result.success?
+
+    raise 'ValidationContracts'
+  end
 
   def authenticate_user!
     auth_header = request.headers['Authorization']
@@ -29,10 +39,30 @@ class ApplicationController < ActionController::API
   end
 
   def handle_options_request
-  head :ok if request.method == 'OPTIONS'
+    head :ok if request.method == 'OPTIONS'
   end
 
   def current_user
     @current_user
+  end
+
+  def current_user_id
+    @current_user.id
+  end
+
+  def serialize_data(data, serializer_class)
+    ActiveModel::Serializer::CollectionSerializer.new(
+      data,
+      serializer: serializer_class
+    )
+  end
+
+  def pagy_metadata(pagy)
+    {
+      current_page: pagy.page,
+      items_per_page: pagy.vars[:items],
+      total_pages: pagy.last,
+      total_items: pagy.in
+    }
   end
 end

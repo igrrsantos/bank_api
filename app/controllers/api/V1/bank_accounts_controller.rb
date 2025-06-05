@@ -2,25 +2,56 @@ module Api
   module V1
     class BankAccountsController < ApplicationController
       def create
-        @bank_account = current_user.bank_accounts.new(bank_account_params)
-        @bank_account.balance = 0.0      # Saldo inicial zero
+        valid_params = valid_attributes(CreateBankAccountContract, params[:bank_account])
 
-        if @bank_account.save
-          render json: {
-            message: 'Conta bancária criada com sucesso',
-            account: bank_account_response(@bank_account)
-          }, status: :created
+        result = CreateBankAccountService.new.call(valid_params.merge(user_id: current_user_id))
+
+        if result.success?
+          render json: result.value!,
+                 each_serializer: BankAccountSerializer,
+                 status: :created
         else
-          render json: {
-            errors: @bank_account.errors.full_messages
-          }, status: :unprocessable_entity
+          render json: { errors: result.failure }, status: :unprocessable_entity
         end
       end
 
-      private
+      def balance
+        valid_params = valid_attributes(BankAccountBalanceContract, params)
 
-      def bank_account_params
-        params.require(:bank_account).permit(:bank_number, :bank_agency_number)
+        result = BankAccountBalanceService.new.call(valid_params.merge(user_id: current_user_id))
+
+        if result.success?
+          render json: BankAccountSerializer.new(result.value!).as_json
+        else
+          render json: { errors: result.failure }, status: :unprocessable_entity
+        end
+      end
+
+      def bank_statement
+        valid_params = valid_attributes(BankStatementContract, params)
+
+        pagy, paginated_result = BankStatementService.new(valid_params.merge(user_id: current_user_id)).call
+
+        if paginated_result.success?
+          render json: {
+            data: serialize_data(paginated_result.value!, BankStatementSerializer),
+            pagination: pagy_metadata(pagy)
+          }, status: :ok
+        else
+          render json: { errors: result.failure }, status: :unprocessable_entity
+        end
+      end
+
+      def deposit
+        valid_params = valid_attributes(DepositContract, params)
+
+        result = DepositService.new(valid_params.merge(user_id: current_user_id)).call
+
+        if result.success?
+          render json: BankAccountSerializer.new(result.value!).as_json
+        else
+          render json: { errors: result.failure }, status: :unprocessable_entity
+        end
       end
     end
   end

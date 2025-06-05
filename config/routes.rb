@@ -1,29 +1,31 @@
 Rails.application.routes.draw do
+  require 'sidekiq/web'
+
   namespace :api do
     namespace :v1 do
       devise_for :users,
-        path: 'auth',
-        path_names: {
-          sign_in: 'login',
-          sign_out: 'logout',
-          registration: 'signup'
-        },
-        controllers: {
-          registrations: 'registrations',
-          sessions: 'sessions'
-        }
+                 path: 'auth',
+                 path_names: {
+                   sign_in: 'login',
+                   sign_out: 'logout',
+                   registration: 'signup'
+                 },
+                 controllers: {
+                   registrations: 'registrations',
+                   sessions: 'sessions'
+                 }
 
       resources :bank_accounts, only: [:create]
-      # # Consultar saldo
-      # GET /api/v1/conta/saldo
-      # # Realizar transferência
-      # POST /api/v1/transferencias
-      # # Agendar transferência
-      # POST /api/v1/transferencias/agendada
-      # # Listar extrato
-      # GET /api/v1/extrato
+      get '/bank_accounts/balance', to: 'bank_accounts#balance'
+      post '/bank_accounts/deposit', to: 'bank_accounts#deposit'
+      get '/bank_accounts/bank_statement', to: 'bank_accounts#bank_statement'
+      get '/bank_accounts/bank_statement', to: 'bank_accounts#bank_statement'
+
+      resources :transactions, only: [:create]
+      post '/transactions/schedule', to: 'transactions#schedule'
     end
   end
-  get "up" => "rails/health#show", as: :rails_health_check
 
+  mount Sidekiq::Web => '/sidekiq'
+  get 'up' => 'rails/health#show', as: :rails_health_check
 end

@@ -1,5 +1,3 @@
-Dry::Validation.load_extensions(:monads)
-
 class CreateUserSessionContract < Dry::Validation::Contract
   params do
     required(:email).filled(:string)
