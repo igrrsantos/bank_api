@@ -10,6 +10,10 @@ RSpec.describe Api::V1::TransactionsController, type: :request do
   end
 
   path '/api/v1/transactions' do
+    let!(:user) { create(:user) }
+    before do
+      allow_any_instance_of(ApplicationController).to receive(:current_user_id).and_return(user.id)
+    end
     post 'Create a transaction (immediate)' do
       tags 'Transactions'
       consumes 'application/json'
