@@ -38,8 +38,8 @@ Implementada em **Ruby on Rails**, testada com **RSpec** e documentada via **Swa
 
 1. **Clone o repositório:**
 ```bash
-git clone https://github.com/seu_usuario/seu_repo.git
-cd seu_repo
+git clone https://github.com/igrrsantos/bank_api.git
+cd bank_api
 ```
 
 2. **Instale as dependências:**
